@@ -77,6 +77,11 @@
               final.haskell.lib.compose.overrideCabal
                 { enableSeparateBinOutput = false; }
                 hprev.wai-extra;
+
+            postgresql-libpq-configure =
+              final.haskell.lib.compose.addBuildTool
+                final.postgresql_15
+                hprev.postgresql-libpq-configure;
           };
 
           # Additional packages that should be available for development.
