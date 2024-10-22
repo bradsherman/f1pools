@@ -65,6 +65,18 @@
               final.haskell.lib.compose.overrideCabal
                 { enableSeparateBinOutput = false; }
                 hprev.async;
+            http2 =
+              final.haskell.lib.compose.overrideCabal
+                { enableSeparateBinOutput = false; }
+                hprev.http2;
+            prettyprinter =
+              final.haskell.lib.compose.overrideCabal
+                { enableSeparateBinOutput = false; }
+                hprev.prettyprinter;
+            wai-extra =
+              final.haskell.lib.compose.overrideCabal
+                { enableSeparateBinOutput = false; }
+                hprev.wai-extra;
           };
 
           # Additional packages that should be available for development.
