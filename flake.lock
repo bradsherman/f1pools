@@ -18,24 +18,7 @@
     },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs",
-        "stacklock2nix": "stacklock2nix"
-      }
-    },
-    "stacklock2nix": {
-      "locked": {
-        "lastModified": 1723895253,
-        "narHash": "sha256-mTaMyu/t05os0gVUdUn0lmOVp1gw5Wwl+Y+pCbluZUo=",
-        "owner": "cdepillabout",
-        "repo": "stacklock2nix",
-        "rev": "6b74b4c3180e3ce7dee6e152b901af38dba6664d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "cdepillabout",
-        "ref": "main",
-        "repo": "stacklock2nix",
-        "type": "github"
+        "nixpkgs": "nixpkgs"
       }
     }
   },
