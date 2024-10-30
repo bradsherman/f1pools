@@ -17,6 +17,7 @@ import Control.Monad.IO.Class (liftIO)
 import Data.Proxy (Proxy (Proxy))
 import Database.PostgreSQL.Simple (Connection)
 import F1Pools.API.Driver (DriverPage, NewDriver, driverPage, handleNewDriver)
+import F1Pools.API.Home (HomePage, homePage)
 import F1Pools.DB (
     Race,
     Race' (..),
@@ -55,6 +56,7 @@ type F1poolsAPI =
                 301
                 '[HTML]
                 (Headers '[Header "Location" String] NoContent)
+        :<|> Get '[HTML] HomePage
 
 server1 :: Connection -> Server F1poolsAPI
 server1 conn =
@@ -62,6 +64,7 @@ server1 conn =
         :<|> liftIO (runRaceSelect conn raceSelect)
         :<|> liftIO (driverPage conn)
         :<|> handleNewDriver conn
+        :<|> liftIO homePage
 
 instance ToHtml SeasonId where
     toHtml (SeasonId sId) = toHtml $ show sId

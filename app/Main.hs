@@ -9,5 +9,5 @@ import Network.Wai.Handler.Warp (run)
 main :: IO ()
 main = do
     putStrLn "Running server on port 8080..."
-    conn <- connectPostgreSQL "postgresql:///formula_one?user=postgres"
+    conn <- connectPostgreSQL "postgresql://postgres:postgres@localhost:5432/formula_one?user=postgres"
     run 8080 (f1poolsApp conn)

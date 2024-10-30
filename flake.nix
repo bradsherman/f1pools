@@ -23,10 +23,9 @@
 
         myHaskellPkgs = final.myBasePkgSet.override {
           overrides = hfinal: hprev: {
-            f1pools = hfinal.callCabal2nix "f1pools" ./. {};
+            f1pools = hfinal.callCabal2nix "f1pools" ./. { };
           };
         };
-
 
         # Our local packages
         f1pools = final.myHaskellPkgs.f1pools;
@@ -37,7 +36,7 @@
         # You can also easily create a development shell for hacking on your local
         # packages with `cabal`.
         f1pools-dev-shell = final.myHaskellPkgs.shellFor {
-          packages = ps: [ps.f1pools];
+          packages = ps: [ ps.f1pools ];
 
           nativeBuildInputs = [
             final.cabal-install

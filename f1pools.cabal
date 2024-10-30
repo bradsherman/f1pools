@@ -27,7 +27,9 @@ library
   exposed-modules:
       F1Pools.API
       F1Pools.API.Driver
+      F1Pools.API.Home
       F1Pools.DB
+      F1Pools.Pages
   other-modules:
       Paths_f1pools
   autogen-modules:

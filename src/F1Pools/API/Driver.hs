@@ -14,11 +14,23 @@ import Control.Monad.IO.Class (liftIO)
 import Data.Aeson (ToJSON)
 import Data.Text (Text)
 import Database.PostgreSQL.Simple (Connection)
+import F1Pools.DB (
+    Driver,
+    Driver' (..),
+    DriverId,
+    DriverId' (DriverId),
+    driverSelect,
+    insertDrivers,
+    runDriverSelect,
+ )
+import F1Pools.Pages (rootF1Page_)
 import GHC.Generics (Generic)
 import Lucid (
+    Attribute,
     ToHtml,
     action_,
     button_,
+    class_,
     div_,
     form_,
     input_,
@@ -32,16 +44,8 @@ import Lucid (
     tr_,
     type_,
  )
+import Lucid.Base (makeAttribute)
 import Opaleye (runInsert, toFields)
-import F1Pools.DB (
-    Driver,
-    Driver' (..),
-    DriverId,
-    DriverId' (DriverId),
-    driverSelect,
-    insertDrivers,
-    runDriverSelect,
- )
 import Servant (Handler, Header, Headers, NoContent (NoContent), addHeader)
 import Web.FormUrlEncoded (FromForm, fromForm, parseUnique)
 
@@ -59,7 +63,10 @@ instance FromForm NewDriver where
             <*> parseUnique "lastName" f
             <*> parseUnique "team" f
 
-handleNewDriver :: Connection -> NewDriver -> Handler (Headers '[Header "Location" String] NoContent)
+handleNewDriver ::
+    Connection ->
+    NewDriver ->
+    Handler (Headers '[Header "Location" String] NoContent)
 handleNewDriver conn x = liftIO $ do
     void . runInsert conn $ insertDrivers theDriver
     pure $ addHeader "/drivers" NoContent
@@ -81,14 +88,29 @@ driverPage :: Connection -> IO DriverPage
 driverPage conn =
     DriverPage <$> runDriverSelect conn driverSelect
 
+hxGet_ :: Text -> Attribute
+hxGet_ = makeAttribute "hx-get"
+
+hxTrigger_ :: Text -> Attribute
+hxTrigger_ = makeAttribute "hx-trigger"
+
+hxPost_ :: Text -> Attribute
+hxPost_ = makeAttribute "hx-post"
+
+hxConfirm_ :: Text -> Attribute
+hxConfirm_ = makeAttribute "hx-confirm"
+
 instance ToHtml DriverPage where
-    toHtml page = div_ $ do
-        toHtml $ drivers page
-        form_ [method_ "post", action_ "/driver/new"] $ do
-            input_ [type_ "text", name_ "firstName"]
-            input_ [type_ "text", name_ "lastName"]
-            input_ [type_ "text", name_ "team"]
-            button_ "submit"
+    toHtml page = do
+        rootF1Page_ . div_ $ do
+            toHtml $ drivers page
+            -- div_ [hxGet_ "/drivers", hxTrigger_ "every 2s"] $ do
+            --     toHtml $ drivers page
+            form_ [method_ "post", action_ "/driver/new"] $ do
+                input_ [type_ "text", name_ "firstName"]
+                input_ [type_ "text", name_ "lastName"]
+                input_ [type_ "text", name_ "team"]
+                button_ "Add Driver"
     toHtmlRaw = toHtml
 
 instance ToHtml DriverId where
@@ -105,7 +127,7 @@ instance ToHtml Driver where
     toHtmlRaw = toHtml
 
 instance ToHtml [Driver] where
-    toHtml seasons = table_ $ do
+    toHtml seasons = table_ [class_ "table-auto"] $ do
         tr_ $ do
             th_ "Driver Id"
             th_ "First Name"
