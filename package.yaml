@@ -40,8 +40,8 @@ library:
   dependencies:
     - aeson
     - http-api-data
-    - lucid
-    # - lucid-htmx
+    - lucid2
+    - htmx-lucid
     - opaleye
     - postgresql-simple
     - product-profunctors

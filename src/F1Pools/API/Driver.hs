@@ -1,137 +1,114 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module F1Pools.API.Driver (
-    driverPage,
     handleNewDriver,
     NewDriver,
     DriverPage,
+
+    -- * API
+    DriversAPI (..),
+    DriverAPI (..),
+    driversHandler,
 ) where
 
 import Control.Monad (void)
 import Control.Monad.IO.Class (liftIO)
-import Data.Aeson (ToJSON)
-import Data.Text (Text)
 import Database.PostgreSQL.Simple (Connection)
-import F1Pools.DB (
+import F1Pools.DB.Driver (
     Driver,
     Driver' (..),
     DriverId,
     DriverId' (DriverId),
+    deleteDriver,
     driverSelect,
+    getDriver,
     insertDrivers,
     runDriverSelect,
  )
-import F1Pools.Pages (rootF1Page_)
+import F1Pools.HTML.Driver (DriverPage (DriverPage), NewDriver (..))
 import GHC.Generics (Generic)
-import Lucid (
-    Attribute,
-    ToHtml,
-    action_,
-    button_,
-    class_,
-    div_,
-    form_,
-    input_,
-    method_,
-    name_,
-    table_,
-    td_,
-    th_,
-    toHtml,
-    toHtmlRaw,
-    tr_,
-    type_,
- )
-import Lucid.Base (makeAttribute)
 import Opaleye (runInsert, toFields)
-import Servant (Handler, Header, Headers, NoContent (NoContent), addHeader)
-import Web.FormUrlEncoded (FromForm, fromForm, parseUnique)
+import Servant (
+    Capture,
+    Delete,
+    FormUrlEncoded,
+    Get,
+    Handler,
+    NamedRoutes,
+    Post,
+    Put,
+    ReqBody,
+    (:-),
+    (:>),
+ )
+import Servant.HTML.Lucid (HTML)
+import Servant.Server.Generic (AsServer)
 
-data NewDriver = NewDriver
-    { ndFirstName :: Text
-    , ndLastName :: Text
-    , ndTeam :: Text
+data DriversAPI mode = DriversAPI
+    { list :: mode :- Get '[HTML] DriverPage
+    , create :: mode :- "new" :> ReqBody '[FormUrlEncoded] NewDriver :> Post '[HTML] [Driver]
+    , driver :: mode :- Capture "driverId" DriverId :> NamedRoutes DriverAPI
     }
-    deriving (Show)
+    deriving stock (Generic)
 
-instance FromForm NewDriver where
-    fromForm f =
-        NewDriver
-            <$> parseUnique "firstName" f
-            <*> parseUnique "lastName" f
-            <*> parseUnique "team" f
+data DriverAPI mode = DriverAPI
+    -- TODO: fix this to only be one 'Driver'
+    { get :: mode :- Get '[HTML] [Driver]
+    , update :: mode :- ReqBody '[FormUrlEncoded] Driver :> Put '[HTML] Driver
+    , delete :: mode :- Delete '[HTML] [Driver]
+    }
+    deriving stock (Generic)
+
+driversHandler :: Connection -> DriversAPI AsServer
+driversHandler conn =
+    DriversAPI
+        { list = listDriversHandler conn
+        , create = createDriverHandler conn
+        , driver = driverHandler conn
+        }
+
+listDriversHandler :: Connection -> Handler DriverPage
+listDriversHandler conn = liftIO (DriverPage <$> runDriverSelect conn driverSelect)
+
+-- TODO: return only one driver
+createDriverHandler :: Connection -> NewDriver -> Handler [Driver]
+createDriverHandler = handleNewDriver
+
+driverHandler :: Connection -> DriverId -> DriverAPI AsServer
+driverHandler conn driverId =
+    DriverAPI
+        { get = getDriverHandler conn driverId
+        , update = updateDriverHandler conn driverId
+        , delete = deleteDriverHandler conn driverId
+        }
+
+getDriverHandler :: Connection -> DriverId -> Handler [Driver]
+getDriverHandler conn driverId =
+    liftIO . runDriverSelect conn $ getDriver driverId
+
+updateDriverHandler :: Connection -> DriverId -> Driver -> Handler Driver
+updateDriverHandler _conn _driverId _updatedDriver = undefined
+
+deleteDriverHandler :: Connection -> DriverId -> Handler [Driver]
+deleteDriverHandler conn driverId = liftIO $ do
+    void $ deleteDriver conn driverId
+    runDriverSelect conn driverSelect
 
 handleNewDriver ::
     Connection ->
     NewDriver ->
-    Handler (Headers '[Header "Location" String] NoContent)
-handleNewDriver conn x = liftIO $ do
+    Handler [Driver]
+handleNewDriver conn newDriver = liftIO $ do
     void . runInsert conn $ insertDrivers theDriver
-    pure $ addHeader "/drivers" NoContent
+    runDriverSelect conn driverSelect
   where
     theDriver =
         [ Driver
             (DriverId Nothing)
-            (toFields $ ndFirstName x)
-            (toFields $ ndLastName x)
-            (toFields $ ndTeam x)
+            (toFields newDriver.ndFirstName)
+            (toFields newDriver.ndLastName)
+            (toFields newDriver.ndTeam)
         ]
-
-newtype DriverPage = DriverPage
-    { drivers :: [Driver]
-    }
-    deriving (Show, Generic, ToJSON)
-
-driverPage :: Connection -> IO DriverPage
-driverPage conn =
-    DriverPage <$> runDriverSelect conn driverSelect
-
-hxGet_ :: Text -> Attribute
-hxGet_ = makeAttribute "hx-get"
-
-hxTrigger_ :: Text -> Attribute
-hxTrigger_ = makeAttribute "hx-trigger"
-
-hxPost_ :: Text -> Attribute
-hxPost_ = makeAttribute "hx-post"
-
-hxConfirm_ :: Text -> Attribute
-hxConfirm_ = makeAttribute "hx-confirm"
-
-instance ToHtml DriverPage where
-    toHtml page = do
-        rootF1Page_ . div_ $ do
-            toHtml $ drivers page
-            -- div_ [hxGet_ "/drivers", hxTrigger_ "every 2s"] $ do
-            --     toHtml $ drivers page
-            form_ [method_ "post", action_ "/driver/new"] $ do
-                input_ [type_ "text", name_ "firstName"]
-                input_ [type_ "text", name_ "lastName"]
-                input_ [type_ "text", name_ "team"]
-                button_ "Add Driver"
-    toHtmlRaw = toHtml
-
-instance ToHtml DriverId where
-    toHtml (DriverId dId) = toHtml $ show dId
-    toHtmlRaw = toHtml
-
-instance ToHtml Driver where
-    toHtml driver =
-        tr_ $ do
-            td_ (toHtml $ driverId driver)
-            td_ (toHtml $ firstName driver)
-            td_ (toHtml $ lastName driver)
-            td_ (toHtml $ team driver)
-    toHtmlRaw = toHtml
-
-instance ToHtml [Driver] where
-    toHtml seasons = table_ [class_ "table-auto"] $ do
-        tr_ $ do
-            th_ "Driver Id"
-            th_ "First Name"
-            th_ "Last Name"
-            th_ "Team"
-        foldMap toHtml seasons
-    toHtmlRaw = toHtml

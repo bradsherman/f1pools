@@ -3,7 +3,57 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    commit: c6c3fd80dd7a2b2d7e91b05722fdf6390ec034fe
+    git: https://github.com/JonathanLorimer/htmx.git
+    name: htmx-lucid
+    pantry-tree:
+      sha256: 98c34dc5ecf2373d952be868fca83e2757269e9ac59b357688938857dfef3869
+      size: 507
+    subdir: htmx-lucid
+    version: 0.2.0.1
+  original:
+    commit: c6c3fd80dd7a2b2d7e91b05722fdf6390ec034fe
+    git: https://github.com/JonathanLorimer/htmx.git
+    subdir: htmx-lucid
+- completed:
+    commit: c6c3fd80dd7a2b2d7e91b05722fdf6390ec034fe
+    git: https://github.com/JonathanLorimer/htmx.git
+    name: htmx-servant
+    pantry-tree:
+      sha256: aebcdc28a5be8e96ee5ed01f4fdf5f24f7213444545c014bb89080532a09801a
+      size: 359
+    subdir: htmx-servant
+    version: 0.2.0.2
+  original:
+    commit: c6c3fd80dd7a2b2d7e91b05722fdf6390ec034fe
+    git: https://github.com/JonathanLorimer/htmx.git
+    subdir: htmx-servant
+- completed:
+    commit: c6c3fd80dd7a2b2d7e91b05722fdf6390ec034fe
+    git: https://github.com/JonathanLorimer/htmx.git
+    name: htmx
+    pantry-tree:
+      sha256: ddd3175ce7711c831af45aa40284010924fff4d46c7ac4d03d7d27f90fd5a7a3
+      size: 381
+    subdir: htmx
+    version: 0.1.0.2
+  original:
+    commit: c6c3fd80dd7a2b2d7e91b05722fdf6390ec034fe
+    git: https://github.com/JonathanLorimer/htmx.git
+    subdir: htmx
+- completed:
+    commit: 2d56bb81b4f8ba5a73368fc89bcc26013c8b9641
+    git: https://github.com/bradsherman/servant-lucid2.git
+    name: servant-lucid
+    pantry-tree:
+      sha256: dba6ccbf12d1f84373b55ed83556e711a298220d7b3123f374312df4af98bf91
+      size: 732
+    version: 0.10.0.0
+  original:
+    commit: 2d56bb81b4f8ba5a73368fc89bcc26013c8b9641
+    git: https://github.com/bradsherman/servant-lucid2.git
 snapshots:
 - completed:
     sha256: 1435a8c3c419d01af402eef9c0938adb601031d8ed625622ef1519fa726db042

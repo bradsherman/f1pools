@@ -40,7 +40,16 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-# extra-deps: []
+extra-deps:
+  - git: https://github.com/JonathanLorimer/htmx.git
+    commit: c6c3fd80dd7a2b2d7e91b05722fdf6390ec034fe
+    subdirs:
+    - htmx-lucid
+    - htmx-servant
+    - htmx
+
+  - git: https://github.com/bradsherman/servant-lucid2.git
+    commit: 2d56bb81b4f8ba5a73368fc89bcc26013c8b9641
 
 # Override default flag values for project packages and extra-deps
 # flags:

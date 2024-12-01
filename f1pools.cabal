@@ -28,7 +28,16 @@ library
       F1Pools.API
       F1Pools.API.Driver
       F1Pools.API.Home
+      F1Pools.API.Season
       F1Pools.DB
+      F1Pools.DB.Driver
+      F1Pools.DB.Race
+      F1Pools.DB.RaceDriver
+      F1Pools.DB.RaceTier
+      F1Pools.DB.Season
+      F1Pools.HTML.Driver
+      F1Pools.HTML.Race
+      F1Pools.HTML.Season
       F1Pools.Pages
   other-modules:
       Paths_f1pools
@@ -40,8 +49,9 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , htmx-lucid
     , http-api-data
-    , lucid
+    , lucid2
     , opaleye
     , postgresql-simple
     , product-profunctors

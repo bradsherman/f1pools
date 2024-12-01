@@ -12,8 +12,10 @@ import GHC.Generics (Generic)
 import Lucid (
     ToHtml,
     a_,
+    class_,
     div_,
     href_,
+    p_,
     toHtml,
     toHtmlRaw,
  )
@@ -26,6 +28,10 @@ data HomePage = HomePage
 
 instance ToHtml HomePage where
     toHtml _ = do
-        rootF1Page_ . div_ $
-            a_ [href_ "/drivers"] "Drivers"
+        rootF1Page_ . div_ $ do
+            p_ [class_ "text-lg"] "Welcome to F1 pools!"
+            div_ $ a_ [href_ "/drivers"] "Drivers"
+            div_ $ a_ [href_ "/racers"] "Racers"
+            div_ $ a_ [href_ "/seasons"] "Seasons"
+
     toHtmlRaw = toHtml
