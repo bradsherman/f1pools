@@ -4,6 +4,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module F1Pools.DB.Race (
+    -- * Types
     Race,
     RaceId,
     RaceId' (..),
@@ -11,12 +12,18 @@ module F1Pools.DB.Race (
     pRaceId,
     Race' (..),
     pRace,
+
+    -- * Select
     runRaceSelect,
     raceTable,
     raceSelect,
+
+    -- * Insert
+    insertRace,
 ) where
 
 import Data.Aeson (FromJSON, ToJSON)
+import Data.Int (Int64)
 import Data.Profunctor.Product.TH (makeAdaptorAndInstanceInferrable)
 import Data.Text (Text)
 import Data.Time (UTCTime)
@@ -25,11 +32,13 @@ import F1Pools.DB.Season (SeasonId, SeasonId' (..), SeasonIdField, pSeasonId)
 import GHC.Generics (Generic)
 import Opaleye (
     Field,
+    Insert (..),
     Select,
     SqlInt4,
     SqlText,
     SqlTimestamptz,
     Table,
+    rCount,
     runSelect,
     selectTable,
     table,
@@ -78,3 +87,12 @@ raceSelect = selectTable raceTable
 
 runRaceSelect :: PSQL.Connection -> Select RaceFieldRead -> IO [Race]
 runRaceSelect = runSelect
+
+insertRace :: [RaceFieldWrite] -> Insert Int64
+insertRace races =
+    Insert
+        { iTable = raceTable
+        , iRows = races
+        , iReturning = rCount
+        , iOnConflict = Nothing
+        }

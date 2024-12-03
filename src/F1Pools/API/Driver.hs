@@ -4,7 +4,6 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module F1Pools.API.Driver (
-    handleNewDriver,
     NewDriver,
     DriverPage,
 
@@ -75,7 +74,17 @@ listDriversHandler conn = liftIO (DriverPage <$> runDriverSelect conn driverSele
 
 -- TODO: return only one driver
 createDriverHandler :: Connection -> NewDriver -> Handler [Driver]
-createDriverHandler = handleNewDriver
+createDriverHandler conn newDriver = liftIO $ do
+    void . runInsert conn $ insertDrivers theDriver
+    runDriverSelect conn driverSelect
+  where
+    theDriver =
+        [ Driver
+            (DriverId Nothing)
+            (toFields newDriver.ndFirstName)
+            (toFields newDriver.ndLastName)
+            (toFields newDriver.ndTeam)
+        ]
 
 driverHandler :: Connection -> DriverId -> DriverAPI AsServer
 driverHandler conn driverId =
@@ -96,19 +105,3 @@ deleteDriverHandler :: Connection -> DriverId -> Handler [Driver]
 deleteDriverHandler conn driverId = liftIO $ do
     void $ deleteDriver conn driverId
     runDriverSelect conn driverSelect
-
-handleNewDriver ::
-    Connection ->
-    NewDriver ->
-    Handler [Driver]
-handleNewDriver conn newDriver = liftIO $ do
-    void . runInsert conn $ insertDrivers theDriver
-    runDriverSelect conn driverSelect
-  where
-    theDriver =
-        [ Driver
-            (DriverId Nothing)
-            (toFields newDriver.ndFirstName)
-            (toFields newDriver.ndLastName)
-            (toFields newDriver.ndTeam)
-        ]

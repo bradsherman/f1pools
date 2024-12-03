@@ -15,6 +15,7 @@ import F1Pools.DB.Driver (
     DriverId,
     DriverId' (DriverId),
  )
+import F1Pools.HTML.Utils (parseNonEmptyText)
 import F1Pools.Pages (rootF1Page_)
 import GHC.Generics (Generic)
 import Htmx.Lucid.Core (OnEvent (DomOnEvent), hxOn_, hxPost_, hxTarget_)
@@ -39,7 +40,7 @@ import Lucid (
     tr_,
     type_,
  )
-import Web.FormUrlEncoded (Form, FromForm, fromForm, parseUnique)
+import Web.FormUrlEncoded (FromForm, fromForm)
 import Web.Internal.HttpApiData (showt)
 
 data NewDriver = NewDriver
@@ -50,12 +51,6 @@ data NewDriver = NewDriver
     deriving (Show, Generic)
 instance ToJSON NewDriver
 instance FromJSON NewDriver
-
-parseNonEmptyText :: Text -> Form -> Either Text Text
-parseNonEmptyText f form = do
-    case parseUnique f form of
-        Left e -> Left e
-        Right v -> if v == "" then Left ("must pass non-empty string for " <> f) else Right v
 
 instance FromForm NewDriver where
     fromForm f =
@@ -112,7 +107,7 @@ instance ToHtml Driver where
     toHtmlRaw = toHtml
 
 instance ToHtml [Driver] where
-    toHtml seasons = do
+    toHtml drivers = do
         h3_ [class_ "font-bold text-2xl mt-4 mb-4"] "Drivers"
         table_ [class_ "table-auto mt-3 mb-3 w-full"] $ do
             tr_ [class_ "grid grid-cols-5 gap-4"] $ do
@@ -121,5 +116,5 @@ instance ToHtml [Driver] where
                 th_ [class_ "p-2 justify-self-start"] "Last Name"
                 th_ [class_ "p-2 justify-self-start"] "Team"
                 th_ [class_ "p-2 justify-self-start"] ""
-            foldMap toHtml seasons
+            foldMap toHtml drivers
     toHtmlRaw = toHtml

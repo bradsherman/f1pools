@@ -61,24 +61,16 @@ data Driver' a b c d = Driver
     , team :: d
     }
     deriving (Show, Generic)
+type Driver = Driver' DriverId Text Text Text
 instance ToJSON Driver
 instance FromJSON Driver
-instance
-    ( FromHttpApiData a
-    , FromHttpApiData b
-    , FromHttpApiData c
-    , FromHttpApiData d
-    ) =>
-    FromForm (Driver' a b c d)
-    where
+instance FromForm Driver where
     fromForm f =
         Driver
             <$> parseUnique "driverId" f
             <*> parseUnique "firstName" f
             <*> parseUnique "lastName" f
             <*> parseUnique "team" f
-
-type Driver = Driver' DriverId Text Text Text
 type DriverFieldWrite = Driver' DriverIdFieldMaybe (Field SqlText) (Field SqlText) (Field SqlText)
 type DriverFieldRead = Driver' DriverIdField (Field SqlText) (Field SqlText) (Field SqlText)
 $(makeAdaptorAndInstanceInferrable "pDriver" ''Driver')

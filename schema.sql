@@ -3,7 +3,8 @@ CREATE DATABASE formula_one;
 \c formula_one
 
 CREATE TABLE season (
-  id serial PRIMARY KEY
+  id serial PRIMARY KEY,
+  description text NOT NULL
 );
 
 CREATE TABLE race (

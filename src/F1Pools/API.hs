@@ -17,6 +17,7 @@ import Data.Proxy (Proxy (Proxy))
 import Database.PostgreSQL.Simple (Connection)
 import F1Pools.API.Driver (DriversAPI, driversHandler)
 import F1Pools.API.Home (HomePage, homePage)
+import F1Pools.API.Race (RacesAPI, racesHandler)
 import F1Pools.API.Season (SeasonsAPI, seasonsHandler)
 import F1Pools.HTML.Season ()
 import GHC.Generics (Generic)
@@ -37,6 +38,7 @@ server conn =
     F1PoolsAPI'
         { seasons = seasonsHandler conn
         , drivers = driversHandler conn
+        , races = racesHandler conn
         , home = homeHandler
         }
 
@@ -48,6 +50,7 @@ type F1PoolsAPI = NamedRoutes F1PoolsAPI'
 data F1PoolsAPI' mode = F1PoolsAPI'
     { seasons :: mode :- "seasons" :> NamedRoutes SeasonsAPI
     , drivers :: mode :- "drivers" :> NamedRoutes DriversAPI
+    , races :: mode :- "races" :> NamedRoutes RacesAPI
     , home :: mode :- Get '[HTML] HomePage
     }
     deriving stock (Generic)
