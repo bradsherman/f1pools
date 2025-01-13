@@ -8,7 +8,7 @@ module F1Pools.HTML.Race (
 ) where
 
 import Data.Text (Text)
-import Data.Time (UTCTime)
+import Data.Time (LocalTime)
 import F1Pools.DB.Race (Race, Race' (..), RaceId, RaceId' (RaceId))
 import F1Pools.DB.Season (Season, Season' (seasonDescription, seasonId), SeasonId)
 import F1Pools.HTML.Season ()
@@ -29,6 +29,7 @@ import Lucid (
     label_,
     name_,
     option_,
+    p_,
     select_,
     table_,
     td_,
@@ -62,17 +63,17 @@ instance ToHtml RacePage where
                 $ do
                     div_ [class_ "grid flex-col"] $ do
                         label_ [for_ "season"] "Season"
-                        select_ [id_ "season", name_ "season"] $ foldMap seasonOption page.seasons
+                        select_ [id_ "season", name_ "season", class_ "select select-bordered w-full max-w-xs"] $ foldMap seasonOption page.seasons
                     div_ [class_ "grid flex-col"] $ do
                         label_ [for_ "name"] "Race Name"
-                        input_ [type_ "text", id_ "name", name_ "name", class_ "border rounded-md p-2"]
+                        input_ [type_ "text", id_ "name", name_ "name", class_ "input input-bordered w-full max-w-xs rounded-md p-2"]
                     div_ [class_ "grid flex-col"] $ do
                         label_ [for_ "location"] "Location"
-                        input_ [type_ "text", id_ "location", name_ "location", class_ "border rounded-md p-2"]
+                        input_ [type_ "text", id_ "location", name_ "location", class_ "input input-bordered w-full max-w-xs rounded-md p-2"]
                     div_ [class_ "grid flex-col"] $ do
-                        label_ [for_ "start_time"] "Start Time"
-                        input_ [type_ "text", id_ "start_time", name_ "start_time", class_ "border rounded-md p-2"]
-                    button_ [class_ "w-1/2 h-1/2 rounded-full self-end bg-green-400"] "Add Race"
+                        label_ [for_ "start_time"] "Start Time (CST)"
+                        input_ [type_ "datetime-local", id_ "start_time", name_ "start_time", class_ "input input-bordered w-full max-w-xs rounded-md p-2"]
+                    button_ [class_ "btn btn-secondary w-1/2 h-1/2 rounded-full self-end"] "Add Race"
       where
         seasonOption :: (Monad m) => Season -> HtmlT m ()
         seasonOption season = option_ [value_ (showt season.seasonId)] $ toHtml season.seasonDescription
@@ -83,7 +84,7 @@ data NewRace = NewRace
     { season :: SeasonId
     , name :: Text
     , location :: Text
-    , startTime :: UTCTime
+    , startTime :: LocalTime
     }
 
 instance FromForm NewRace where
@@ -100,7 +101,7 @@ instance ToHtml RaceId where
 
 instance ToHtml Race where
     toHtml race =
-        tr_ [class_ "border grid grid-cols-5 gap-4"] $ do
+        tr_ [class_ "hover border grid grid-cols-5 gap-4"] $ do
             td_ [class_ "p-2 content-center"] (toHtml race.raceSeasonId)
             td_ [class_ "p-2 content-center"] (toHtml race.raceName)
             td_ [class_ "p-2 content-center"] (toHtml race.raceLocation)
@@ -109,10 +110,13 @@ instance ToHtml Race where
     toHtmlRaw = toHtml
 
 instance ToHtml [Race] where
+    toHtml [] = do
+        h3_ [class_ "font-bold text-2xl mt-4 mb-4"] "Races"
+        p_ [class_ ""] "No races yet..."
     toHtml races = do
         h3_ [class_ "font-bold text-2xl mt-4 mb-4"] "Races"
-        table_ [class_ "table-auto mt-3 mb-3 w-full"] $ do
-            tr_ [class_ "grid grid-cols-5 gap-4"] $ do
+        table_ [class_ "table mt-3 mb-3 w-full"] $ do
+            tr_ [class_ "border grid grid-cols-5 gap-4"] $ do
                 th_ [class_ "p-2 justify-self-start"] "Season"
                 th_ [class_ "p-2 justify-self-start"] "Name"
                 th_ [class_ "p-2 justify-self-start"] "Location"

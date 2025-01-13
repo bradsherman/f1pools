@@ -23,6 +23,7 @@ import F1Pools.DB.Season (
     seasonSelect,
  )
 import F1Pools.HTML.Race (NewRace (..), RacePage (RacePage))
+import F1Pools.Time (chicagoUTCTime)
 import GHC.Generics (Generic)
 import Opaleye (runInsert, toFields)
 import Servant (FormUrlEncoded, Get, Handler, Post, ReqBody, (:-), (:>))
@@ -59,5 +60,5 @@ createRaceHandler conn newRace = liftIO $ do
             (toFields newRace.season)
             (toFields newRace.name)
             (toFields newRace.location)
-            (toFields newRace.startTime)
+            (toFields $ chicagoUTCTime newRace.startTime)
         ]

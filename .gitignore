@@ -2,3 +2,5 @@
 result
 result-bin
 tags
+node_modules/
+dist/

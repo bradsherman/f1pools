@@ -42,6 +42,7 @@ library:
     - http-api-data
     - lucid2
     - htmx-lucid
+    - foreign-store
     - opaleye
     - postgresql-simple
     - product-profunctors
@@ -50,7 +51,9 @@ library:
     - servant-server
     - text
     - time
+    - tz
     - wai
+    - warp
 
 executables:
   f1pools-app:

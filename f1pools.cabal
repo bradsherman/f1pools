@@ -36,11 +36,13 @@ library
       F1Pools.DB.RaceDriver
       F1Pools.DB.RaceTier
       F1Pools.DB.Season
+      F1Pools.DevelMain
       F1Pools.HTML.Driver
       F1Pools.HTML.Race
       F1Pools.HTML.Season
       F1Pools.HTML.Utils
       F1Pools.Pages
+      F1Pools.Time
   other-modules:
       Paths_f1pools
   autogen-modules:
@@ -51,6 +53,7 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , foreign-store
     , htmx-lucid
     , http-api-data
     , lucid2
@@ -62,7 +65,9 @@ library
     , servant-server
     , text
     , time
+    , tz
     , wai
+    , warp
   default-language: GHC2021
 
 executable f1pools-app

@@ -29,6 +29,7 @@ import Lucid (
     input_,
     label_,
     name_,
+    p_,
     table_,
     td_,
     th_,
@@ -59,7 +60,7 @@ instance ToHtml SeasonPage where
                     div_ [class_ "grid flex-col"] $ do
                         label_ [for_ "description"] "Season Description"
                         input_ [type_ "text", id_ "description", name_ "description", class_ "border rounded-md p-2"]
-                    button_ [class_ "w-1/2 h-1/2 rounded-full self-end bg-green-400"] "Add Season"
+                    button_ [class_ "btn btn-secondary w-1/2 h-1/2 rounded-full self-end"] "Add Season"
 
     toHtmlRaw = toHtml
 
@@ -74,18 +75,20 @@ instance ToHtml SeasonId where
 
 instance ToHtml Season where
     toHtml season =
-        tr_ [class_ "border grid grid-cols-5 gap-4"] $ do
+        tr_ [class_ "hover border grid grid-cols-2 gap-4"] $ do
             td_ [class_ "p-2 content-center"] (toHtml season.seasonId)
             td_ [class_ "p-2 content-center"] (toHtml season.seasonDescription)
     toHtmlRaw = toHtml
 
 instance ToHtml [Season] where
-    toHtml drivers = do
-        h3_ [class_ "font-bold text-2xl mt-4 mb-4"] "Drivers"
-        table_ [class_ "table-auto mt-3 mb-3 w-full"] $ do
-            tr_ [class_ "grid grid-cols-3 gap-4"] $ do
+    toHtml [] = do
+        h3_ [class_ "font-bold text-2xl mt-4 mb-4"] "Seasons"
+        p_ [class_ ""] "No seasons yet..."
+    toHtml seasons = do
+        h3_ [class_ "font-bold text-2xl mt-4 mb-4"] "Seasons"
+        table_ [class_ "table mt-3 mb-3 w-full"] $ do
+            tr_ [class_ "border grid grid-cols-2 gap-4"] $ do
                 th_ [class_ "p-2 justify-self-start"] "Season"
                 th_ [class_ "p-2 justify-self-start"] "Description"
-                th_ [class_ "p-2 justify-self-start"] ""
-            foldMap toHtml drivers
+            foldMap toHtml seasons
     toHtmlRaw = toHtml

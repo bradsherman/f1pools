@@ -61,6 +61,7 @@
             final.dive
             final.flyctl
             final.watchman
+            final.bun
 
             final.myBasePkgSet.haskell-language-server
           ];

@@ -22,8 +22,8 @@ import F1Pools.API.Season (SeasonsAPI, seasonsHandler)
 import F1Pools.HTML.Season ()
 import GHC.Generics (Generic)
 import Network.Wai (Application)
-import Servant (Handler, NamedRoutes, serve)
-import Servant.API (Get, (:-), (:>))
+import Servant (Handler, NamedRoutes, ServerT, serve, serveDirectoryFileServer)
+import Servant.API (Get, Raw, (:-), (:>))
 import Servant.HTML.Lucid (HTML)
 import Servant.Server.Generic (AsServer)
 
@@ -40,10 +40,14 @@ server conn =
         , drivers = driversHandler conn
         , races = racesHandler conn
         , home = homeHandler
+        , dist = distHandler
         }
 
 homeHandler :: Handler HomePage
 homeHandler = liftIO homePage
+
+distHandler :: ServerT Raw m
+distHandler = serveDirectoryFileServer "dist"
 
 type F1PoolsAPI = NamedRoutes F1PoolsAPI'
 
@@ -52,5 +56,6 @@ data F1PoolsAPI' mode = F1PoolsAPI'
     , drivers :: mode :- "drivers" :> NamedRoutes DriversAPI
     , races :: mode :- "races" :> NamedRoutes RacesAPI
     , home :: mode :- Get '[HTML] HomePage
+    , dist :: mode :- Raw
     }
     deriving stock (Generic)
